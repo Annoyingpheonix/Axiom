@@ -77,7 +77,7 @@ import {
 } from './types';
 import StatRadar from './components/StatRadar';
 import Onboarding from './components/Onboarding';
-import WorldsPortal from './components/WorldsPortal';
+import WorldsDirectory from './components/WorldsDirectory';
 import { generateQuestFromGoal, verifyEvidence } from './services/geminiService';
 
 // --- Constants & Helpers ---
@@ -130,6 +130,7 @@ const INITIAL_STATS: UserStats = {
   gold: 250,
   credits: 50, 
   dailyEarnings: { gold: 0, xp: 0, credits: 0, lastReset: Date.now() },
+  essence: 0,
   skillPoints: 0,
   unlockedSkills: [],
   guildId: 'g1',
@@ -490,7 +491,7 @@ export default function App() {
   };
 
   const finalizeHabitCompletion = (status: VerificationStatus) => {
-     if (!verificationHabit) return;
+     if (!verificationHabit || habits.some(h => h.id === verificationHabit.id && h.completed)) return;
      // Allow 'SOFT_APPROVE' to pass but with reduced rewards (logic implicit in fraud score handling if expanded)
      if (status === VerificationStatus.REJECTED) {
          setVerificationHabit(null);
@@ -540,7 +541,8 @@ export default function App() {
              maxXp: newMaxXp,
              classLevel: newClassLevel,
              classXp: newClassXp,
-             gold: prev.gold + (actualXp / 2),
+             essence: prev.essence + (status === VerificationStatus.VERIFIED ? (verificationHabit.difficulty === 'HARD' ? 6 : verificationHabit.difficulty === 'MEDIUM' ? 3 : 1) : 0),
+             // Habits no longer mint Gold or AXM.
              streak: prev.streak + 1, // Increment global streak
              // Mock history update (push true, remove first)
              history: [...prev.history.slice(1), true]
@@ -556,6 +558,19 @@ export default function App() {
      }
      setVerificationHabit(null);
   };
+
+  const upgradeAttribute = (stat: StatType) => {
+    setUser(prev => {
+      const cost = 5 + Math.max(0, prev.attributes[stat] - 10) * 2;
+      if (prev.essence < cost) return prev;
+      return { ...prev, essence: prev.essence - cost, attributes: { ...prev.attributes, [stat]: prev.attributes[stat] + 1 } };
+    });
+  };
+  useEffect(() => {
+    const navigate = () => setActiveTab('marketplace');
+    document.addEventListener('axiom:navigate-marketplace', navigate);
+    return () => document.removeEventListener('axiom:navigate-marketplace', navigate);
+  }, []);
 
   const handleSendMessage = () => {
     if (!chatInput.trim()) return;
@@ -575,6 +590,20 @@ export default function App() {
 
   const renderProfile = () => (
       <div className="grid lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+          <div className="lg:col-span-3 rounded-xl border border-violet-500/30 bg-axiom-800 p-5 space-y-3">
+             <h3 className="font-bold text-lg flex items-center gap-2"><Sparkles className="w-5 h-5 text-violet-300" /> Essence Upgrades</h3>
+             <p className="text-sm text-slate-400">Verified habits earn account-bound Essence. Upgrade your global stats. Essence cannot be converted into Gold or AXM.</p>
+             <p className="text-violet-300 font-bold">Available Essence: {user.essence}</p>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+               {Object.values(StatType).map(stat => {
+                 const cost = 5 + Math.max(0, user.attributes[stat] - 10) * 2;
+                 return <button key={stat} disabled={user.essence < cost} onClick={() => upgradeAttribute(stat)} className="rounded-lg bg-slate-900 border border-slate-700 p-3 text-left disabled:opacity-50">
+                   <span className="font-semibold">{stat}: {user.attributes[stat]}</span>
+                   <span className="block text-xs text-slate-400">+1 for {cost} Essence</span>
+                 </button>;
+               })}
+             </div>
+          </div>
           {/* Left Column: Identity & Stats */}
           <div className="space-y-6">
               {/* Identity Card */}
@@ -1114,7 +1143,7 @@ export default function App() {
                          </div>
                     </div>}
                     
-                    {activeTab === 'worlds' && <WorldsPortal playerName={user.name || 'Adventurer'} />}
+                    {activeTab === 'worlds' && <WorldsDirectory />}
                     {activeTab === 'marketplace' && renderMarketplace()}
                     {activeTab === 'profile' && renderProfile()}
                     {activeTab === 'social' && renderSocial()}
