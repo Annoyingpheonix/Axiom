@@ -77,6 +77,7 @@ import {
 } from './types';
 import StatRadar from './components/StatRadar';
 import Onboarding from './components/Onboarding';
+import WorldsPortal from './components/WorldsPortal';
 import { generateQuestFromGoal, verifyEvidence } from './services/geminiService';
 
 // --- Constants & Helpers ---
@@ -351,7 +352,7 @@ const VerificationModal: React.FC<{ habit: Habit; userProfile: UserProfile; onCl
 // --- Main App ---
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'marketplace' | 'social' | 'profile'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'marketplace' | 'social' | 'profile' | 'worlds'>('dashboard');
   const [marketTab, setMarketTab] = useState<'ALL' | 'SKILL' | 'COSMETIC' | 'PREMIUM'>('ALL');
   const [socialTab, setSocialTab] = useState<'guild' | 'allies' | 'leaderboard'>('guild');
   const [user, setUser] = useState<UserStats>({ ...INITIAL_STATS, socialRank: SocialRank.G }); // Start at G
@@ -999,6 +1000,7 @@ export default function App() {
             <div className="fixed inset-0 z-40 bg-axiom-900/95 lg:hidden flex flex-col p-6 animate-in fade-in duration-200">
                 <div className="flex justify-between items-center mb-8"><span className="font-display font-bold text-2xl text-white">Menu</span><button onClick={() => setMobileMenuOpen(false)}><X className="w-6 h-6" /></button></div>
                 <nav className="space-y-4">
+                    <button onClick={() => { setActiveTab('worlds'); setMobileMenuOpen(false); }} className="w-full text-left text-xl font-bold text-violet-300">Connected Worlds</button>
                     <button onClick={() => { setActiveTab('dashboard'); setMobileMenuOpen(false); }} className="w-full text-left text-xl font-bold text-slate-500">Dashboard</button>
                     <button onClick={() => { setActiveTab('marketplace'); setMobileMenuOpen(false); }} className="w-full text-left text-xl font-bold text-slate-500">Marketplace</button>
                     <button onClick={() => { setActiveTab('profile'); setMobileMenuOpen(false); }} className="w-full text-left text-xl font-bold text-slate-500">Identity</button>
@@ -1015,6 +1017,7 @@ export default function App() {
                     <h1 className="font-display font-bold text-2xl text-white tracking-tight">AXIOM</h1>
                 </div>
                 <nav className="space-y-2 flex-1">
+                    <button onClick={() => setActiveTab('worlds')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'worlds' ? 'bg-axiom-800 text-white shadow-lg border border-slate-700' : 'text-slate-500 hover:text-slate-300 hover:bg-axiom-800/50'}`}><Globe className="w-5 h-5" /> Worlds</button>
                     <button onClick={() => setActiveTab('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'dashboard' ? 'bg-axiom-800 text-white shadow-lg border border-slate-700' : 'text-slate-500 hover:text-slate-300 hover:bg-axiom-800/50'}`}><Activity className="w-5 h-5" /> Dashboard</button>
                     <button onClick={() => setActiveTab('marketplace')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'marketplace' ? 'bg-axiom-800 text-white shadow-lg border border-slate-700' : 'text-slate-500 hover:text-slate-300 hover:bg-axiom-800/50'}`}><ShoppingBag className="w-5 h-5" /> Marketplace</button>
                     <button onClick={() => setActiveTab('profile')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'profile' ? 'bg-axiom-800 text-white shadow-lg border border-slate-700' : 'text-slate-500 hover:text-slate-300 hover:bg-axiom-800/50'}`}><Fingerprint className="w-5 h-5" /> Identity</button>
@@ -1111,6 +1114,7 @@ export default function App() {
                          </div>
                     </div>}
                     
+                    {activeTab === 'worlds' && <WorldsPortal playerName={user.name || 'Adventurer'} />}
                     {activeTab === 'marketplace' && renderMarketplace()}
                     {activeTab === 'profile' && renderProfile()}
                     {activeTab === 'social' && renderSocial()}
