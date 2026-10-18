@@ -5,7 +5,10 @@ const games = [
  { name:'Axiom: Ascension', genre:'Third-person action roguelite', status:'Planned first PC game', details:'15–25 minute runs, loot, bosses, and class-sensitive bonuses.' },
  { name:'Axiom: The Labyrinth', genre:'Isometric puzzle-action', status:'Concept', details:'Logic encounters, traps, and exploration.' },
  { name:'Axiom: Neon Frontier', genre:'Sci-fi extraction', status:'Concept', details:'Recover technology and escape dangerous facilities.' },
- { name:'Axiom: Sanctuary', genre:'Crafting and settlement', status:'Concept', details:'Noncombat building, exploration, and community play.' }
+ { name:'Axiom: Sanctuary', genre:'Crafting and settlement', status:'Concept', details:'Noncombat building, exploration, and community play.' },
+ { name:'Axiom: Crucible', genre:'Third-person PvP arena', status:'Concept', details:'Ranked 1v1 duels, 2v2 battles, seasonal tournaments, and fair stat-normalized matchmaking.' },
+ { name:'Axiom: Dreadveil', genre:'First-person horror thriller', status:'Concept', details:'Stealth, psychological horror, puzzles, and survival against an intelligent pursuer.' },
+ { name:'Axiom: Skybound', genre:'2D or 3D precision platformer', status:'Concept', details:'Time trials, movement challenges, secret routes, and ghost racing.' }
 ];
 export default function WorldsDirectory() {
  return <section className="space-y-6 text-slate-100" aria-label="PC worlds directory">
