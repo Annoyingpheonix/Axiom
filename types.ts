@@ -243,6 +243,7 @@ export interface UserStats {
     lastReset: number;
   };
 
+  essence: number; // Nontransferable resource from verified habits
   skillPoints: number;
   unlockedSkills: Skill[]; // Full skill objects
   guildId?: string;
